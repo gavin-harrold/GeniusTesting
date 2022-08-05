@@ -2,6 +2,10 @@ from asyncore import write
 from tokens import client_id, client_secret, token 
 from lyricsgenius import Genius
 import numpy as np
+import cv2 as cv
+
+
+
 
 def write_lyrics(artist):
     txt = ''
@@ -33,6 +37,8 @@ def main():
     file = open("GravyLyrics200.txt", "w")
     file.write(text)
     file.close()
+
+
 
 
 
