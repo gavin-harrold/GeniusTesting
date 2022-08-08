@@ -1,8 +1,7 @@
-from asyncore import write
+import tensorflow as tf
 from tokens import client_id, client_secret, token 
 from lyricsgenius import Genius
 import numpy as np
-import cv2 as cv
 
 
 
@@ -12,7 +11,7 @@ def write_lyrics(artist):
 
     special_chars = set([ 'ँ', 'आ', 'ए', 'क', 'ग', 'ज', 'त',
        'द', 'ध', 'न', 'प', 'ब', 'म', 'य', 'र', 'व', 'श', 'ह', 'ा', 'ि',
-       'ी', 'ू', 'े', 'ै', 'ो', '्', '\u2005', '\u200c', '—', '‘', '’',
+       'ी', 'ू', 'े', 'ै', 'ो', '्', '\u2005', '\u200c', '—', 
        '\u205f', '느', '사', '어', '이', '제', '죠', '품', '회','\u0435','\xa0','\u200b'])
 
 
