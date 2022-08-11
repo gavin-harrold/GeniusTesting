@@ -51,14 +51,34 @@ def calculate_line_average(file):
 
 
 def create_seq_targets(seq):
+    """
+    shift text and group as tuple
+    @param seq: input text sequence
+    @returns tuple of input_txt and target_txt
+    """
     input_txt = seq[:-1]
     target_txt = seq[1:]
     return input_txt, target_txt
 
 def sparse_cat_loss(y_true,y_pred):
+    """
+    loss function using Keras' loss function
+    @param y_true: ground truth values
+    @param y_pred: predicted values
+    @returns sparse categorical crossentropy loss value
+    """
     return sparse_categorical_crossentropy(y_true, y_pred, from_logits=True)
 
+
 def create_model(vocab_size, embed_dim, rnn_neurons, batch_size):
+    """
+    creates model for tf
+    @param vocab_size: length of vocab
+    @param embed_dim: embed dimension
+    @param rnn_neurons: neuron count
+    @param batch_size: batch size
+    @returns newly created model
+    """
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim, batch_input_shape=[batch_size, None]))
     model.add(GRU(rnn_neurons, return_sequences=True, stateful=True, recurrent_initializer='glorot_uniform'))
