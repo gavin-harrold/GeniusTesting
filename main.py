@@ -44,6 +44,11 @@ def calculate_line_average(file):
     return sum/lineCount
 
 
+def create_seq_targets(seq):
+    input_txt = seq[:-1]
+    target_txt = seq[1:]
+    return input_txt, target_txt
+
 def main():
     """
         Main :)
@@ -70,6 +75,30 @@ def main():
     averageLineLength = calculate_line_average('GravyLyrics200.txt')
     print(int(averageLineLength))
     
+    #training sequences
+    seq_length = 120
+    total_seq_len = len(text)//(seq_length+1)
+    
+    char_dataset = tf.data.Dataset.from_tensor_slices(encoded_text)
+    sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
+
+    dataset = sequences.map(create_seq_targets)
+
+    for input_txt, target_txt in dataset.take(1):
+        print(input_txt.numpy())
+        print(''.join(ind_to_char[input_txt.numpy()]))
+        print('\n')
+        print(target_txt.numpy())
+        print(''.join(ind_to_char[target_txt.numpy()]))
+
+    #creating batches!
+    batch_size = 128
+    buffer_size = 10000
+    dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
+
+    
+
+
 
 
 
