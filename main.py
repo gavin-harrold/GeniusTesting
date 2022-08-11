@@ -137,6 +137,15 @@ def main():
     vocab_size = len(vocab)
     embed_dim = 64
     rnn_neurons = 1026
+    #actually create da model
+    model = create_model(
+        vocab_size=vocab_size,
+        embed_dim=embed_dim,
+        rnn_neurons=rnn_neurons,
+        batch_size=batch_size
+    )
+    #debug, prints model summary
+    print(model.summary())
 
 
 
