@@ -2,6 +2,10 @@ import tensorflow as tf
 from tokens import client_id, client_secret, token 
 from lyricsgenius import Genius
 import numpy as np
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8d44df863d2d6ef1657bd5d5a1ede22c3c258ec9
 
 
 
