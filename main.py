@@ -2,15 +2,11 @@ import tensorflow as tf
 from tokens import client_id, client_secret, token 
 from lyricsgenius import Genius
 import numpy as np
+from os import path
 
 from keras.models import Sequential
 from keras.layers import LSTM,Dense,Embedding,Dropout,GRU
 from keras.losses import sparse_categorical_crossentropy
-
-
-
-
-
 
 def write_lyrics(artist):
     """
@@ -91,15 +87,17 @@ def main():
         Main :)
     """
     genius = Genius(token)
-    #this fucking chugs for no reason (very dumb)
-    artist = genius.search_artist("Yung Gravy", max_songs=20)
-    artist.save_lyrics('Gravy20.json')
+    #check if file already exists so it doesn't have to always chug
+    if not path.exists("GravyLyrics200.txt"):
+        #this fucking chugs for no reason (very dumb)
+        artist = genius.search_artist("Yung Gravy", max_songs=20)
+        artist.save_lyrics('Gravy20.json')
 
-    #writing lyric to file
-    text = write_lyrics(artist)
-    file = open("GravyLyrics200.txt", "w")
-    file.write(text)
-    file.close()
+        #writing lyric to file
+        text = write_lyrics(artist)
+        file = open("GravyLyrics200.txt", "w")
+        file.write(text)
+        file.close()
 
     #prep data for Tensor
     with open('GravyLyrics200.txt') as f:
@@ -121,13 +119,15 @@ def main():
 
     dataset = sequences.map(create_seq_targets)
 
+    #printing stuff
+    """
     for input_txt, target_txt in dataset.take(1):
         print(input_txt.numpy())
         print(''.join(ind_to_char[input_txt.numpy()]))
         print('\n')
         print(target_txt.numpy())
         print(''.join(ind_to_char[target_txt.numpy()]))
-
+    """
     #creating batches!
     batch_size = 128
     buffer_size = 10000
@@ -146,6 +146,11 @@ def main():
     )
     #debug, prints model summary
     print(model.summary())
+
+    #model training!!!!!
+    for input_example_batch, target_example_batch in dataset.take(1):
+        example_batch_predictions = model(input_example_batch)
+        print(example_batch_predictions.shape, " <=== (batch_size, seq_length, vocab_size)")
 
 
 
