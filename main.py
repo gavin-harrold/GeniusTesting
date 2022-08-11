@@ -152,7 +152,15 @@ def main():
         example_batch_predictions = model(input_example_batch)
         print(example_batch_predictions.shape, " <=== (batch_size, seq_length, vocab_size)")
 
+    sampled_indices = tf.random.categorical(example_batch_predictions[0], num_samples=1)
+    #format to singular list rather than list of list
+    sampled_indices = tf.squeeze(sampled_indices,axis=-1).numpy()
 
+    #print stuff
+    print("Given the input sequence: \n")
+    print("".join((ind_to_char[input_example_batch[0]])))
+    print("\n")
+    print("".join(ind_to_char[sampled_indices]))
 
 
 
