@@ -3,6 +3,12 @@ from tokens import client_id, client_secret, token
 from lyricsgenius import Genius
 import numpy as np
 
+from keras.models import Sequential
+from keras.layers import LSTM,Dense,Embedding,Dropout,GRU
+from keras.losses import sparse_categorical_crossentropy
+
+
+
 
 
 
@@ -48,6 +54,17 @@ def create_seq_targets(seq):
     input_txt = seq[:-1]
     target_txt = seq[1:]
     return input_txt, target_txt
+
+def sparse_cat_loss(y_true,y_pred):
+    return sparse_categorical_crossentropy(y_true, y_pred, from_logits=True)
+
+def create_model(vocab_size, embed_dim, rnn_neurons, batch_size):
+    model = Sequential()
+    model.add(Embedding(vocab_size, embed_dim, batch_input_shape=[batch_size, None]))
+    model.add(GRU(rnn_neurons, return_sequences=True, stateful=True, recurrent_initializer='glorot_uniform'))
+    model.add(Dense(vocab_size))
+    model.compile(optimizer='adam', loss=sparse_cat_loss)
+    return model
 
 def main():
     """
@@ -96,7 +113,12 @@ def main():
     buffer_size = 10000
     dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
 
-    
+    #model creation (LSTM)
+    vocab_size = len(vocab)
+    embed_dim = 64
+    rnn_neurons = 1026
+
+
 
 
 
