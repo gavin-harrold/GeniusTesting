@@ -4,9 +4,12 @@ from lyricsgenius import Genius
 import numpy as np
 from os import path
 
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import LSTM,Dense,Embedding,Dropout,GRU
 from keras.losses import sparse_categorical_crossentropy
+
+
+FILE = "GravyLyrics100.txt"
 
 def write_lyrics(artist):
     """
@@ -82,25 +85,41 @@ def create_model(vocab_size, embed_dim, rnn_neurons, batch_size):
     model.compile(optimizer='adam', loss=sparse_cat_loss)
     return model
 
+def generate_text(model, start_seed, char_to_ind, ind_to_char, gen_size=100, temp=1.0):
+    num_generate = gen_size
+    input_eval = [char_to_ind[s] for s in start_seed]
+    input_eval = tf.expand_dims(input_eval, 0)
+    text_generated = []
+
+    model.reset_states()
+    for i in range(num_generate):
+        predictions = model(input_eval)
+        predictions = tf.squeeze(predictions, 0)
+        predictions = predictions / temp
+        predicted_id = tf.random.categorical(predictions, num_samples=1)[-1, 0].numpy()
+        input_eval = tf.expand_dims([predicted_id], 0)
+        text_generated.append(ind_to_char[predicted_id])
+    return (start_seed + ''.join(text_generated))
+
 def main():
     """
         Main :)
     """
     genius = Genius(token)
     #check if file already exists so it doesn't have to always chug
-    if not path.exists("GravyLyrics200.txt"):
+    if not path.exists(FILE):
         #this fucking chugs for no reason (very dumb)
-        artist = genius.search_artist("Yung Gravy", max_songs=20)
-        artist.save_lyrics('Gravy20.json')
+        artist = genius.search_artist("Yung Gravy", max_songs=100)
+        artist.save_lyrics('Gravy100.json')
 
         #writing lyric to file
         text = write_lyrics(artist)
-        file = open("GravyLyrics200.txt", "w")
+        file = open(FILE, "w")
         file.write(text)
         file.close()
 
     #prep data for Tensor
-    with open('GravyLyrics200.txt') as f:
+    with open(FILE) as f:
         text = f.read()
     
     vocab = sorted(set(text))
@@ -162,6 +181,14 @@ def main():
     print("\n")
     print("".join(ind_to_char[sampled_indices]))
 
+    epochs = 100
+    model.fit(dataset, epochs=epochs)
+    model.save('gravy_gen.h5')
+    model = create_model(vocab_size, embed_dim, rnn_neurons, batch_size=1)
+    model.load_weights('gravy_gen.h5')
+    model.build(tf.TensorShape([1, None]))
+
+    print(generate_text(model, 'Hey', char_to_ind, ind_to_char, gen_size=1000))
 
 
 

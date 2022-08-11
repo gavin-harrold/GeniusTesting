@@ -1,6 +1,6 @@
 /__pycache__
 tokens.py
-Gravy20.json
-GravyLyrics200.txt
-<<<<<<< HEAD
+*.json
+*.txt
+*.h5
 *.sh
