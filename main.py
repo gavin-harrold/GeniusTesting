@@ -1,3 +1,4 @@
+import json
 import tensorflow as tf
 from tokens import client_id, client_secret, token 
 from lyricsgenius import Genius
@@ -8,8 +9,10 @@ from keras.models import Sequential, load_model
 from keras.layers import LSTM,Dense,Embedding,Dropout,GRU
 from keras.losses import sparse_categorical_crossentropy
 
-
-FILE = "GravyLyrics100.txt"
+ARTIST = input("Enter an artist to emulate: ")
+SONG_COUNT = input("Enter the amount of songs to attempt to track: ")
+FILE = ARTIST + "Lyrics" + SONG_COUNT + ".txt"
+#"GravyLyrics100.txt"
 
 def write_lyrics(artist):
     """
@@ -109,8 +112,9 @@ def main():
     #check if file already exists so it doesn't have to always chug
     if not path.exists(FILE):
         #this fucking chugs for no reason (very dumb)
-        artist = genius.search_artist("Yung Gravy", max_songs=100)
-        artist.save_lyrics('Gravy100.json')
+        artist = genius.search_artist(ARTIST, max_songs=int(SONG_COUNT))
+        json_file = ARTIST + SONG_COUNT + ".json"
+        artist.save_lyrics(json_file)
 
         #writing lyric to file
         text = write_lyrics(artist)
@@ -126,7 +130,7 @@ def main():
     char_to_ind = {u:i for i, u in enumerate(vocab)}
     ind_to_char = np.array(vocab)
     encoded_text = np.array([char_to_ind[c] for c in text])
-    averageLineLength = calculate_line_average('GravyLyrics200.txt')
+    averageLineLength = calculate_line_average(FILE)
     print(int(averageLineLength))
     
     #training sequences
@@ -183,9 +187,9 @@ def main():
 
     epochs = 100
     model.fit(dataset, epochs=epochs)
-    model.save('gravy_gen.h5')
+    model.save(ARTIST + '_gen.h5')
     model = create_model(vocab_size, embed_dim, rnn_neurons, batch_size=1)
-    model.load_weights('gravy_gen.h5')
+    model.load_weights(ARTIST + '_gen.h5')
     model.build(tf.TensorShape([1, None]))
 
     print(generate_text(model, 'Hey', char_to_ind, ind_to_char, gen_size=1000))
